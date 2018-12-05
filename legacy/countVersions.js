@@ -1,15 +1,15 @@
-var semver = require('semver');
-var intersect = require('semver-set').intersect;
+const semver = require('semver');
+const {intersect} = require('@voxpelli/semver-set');
 
-var argv = require('minimist')(process.argv.slice(2));
-var packageName = argv['_'][0];
+const argv = require('minimist')(process.argv.slice(2));
+const packageName = argv['_'][0];
 if (!packageName) {
   printUsage();
   process.exit(101);
 }
 
-var printNames = argv['print-names'];
-var semverFilter = argv['semver'];
+const printNames = argv['print-names'];
+const semverFilter = argv['semver'];
 
 if (semverFilter && !semver.validRange(semverFilter)) {
   printUsage();
