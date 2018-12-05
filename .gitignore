@@ -15,3 +15,5 @@ backup
 
 npm-debug.log
 node_modules
+
+found-modules*

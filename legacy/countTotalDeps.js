@@ -9,7 +9,7 @@
  *
  * Prerequisites:
  *  1. Download npm graph with `01_get_graph.sh`
- *  2. Convert it to graph with `node convertToGraph.js`
+ *  2. Convert it to graph with `node 02_create_graph.js`
  */
 var fromjson = require('ngraph.fromjson');
 var fs = require('fs');
