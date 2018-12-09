@@ -1,6 +1,7 @@
 // Configurable Values
 const PAGE_SIZE = 100;
 const PAGE_START = 0;
+const PAGE_END = 10000001;
 
 // Imports
 const inputFileName = process.argv[2] || "./data/dependenciesGraph.out.graph";
@@ -12,7 +13,11 @@ const got = require("got");
 const errors = [];
 
 function loadFile() {
-  return JSON.parse(fs.readFileSync("./found-modules.json"));
+  try {
+    return JSON.parse(fs.readFileSync("./found-modules.json"));
+  } catch (err) {
+    return [];
+  }
 }
 
 function saveFile(modulePackages) {
@@ -58,14 +63,14 @@ async function analyzePackageForModule(pkgName) {
 
 async function run(stats) {
   const allKeys = Object.keys(stats);
-  const modulePackages = loadFile();
+  const modulePackages = new Set(loadFile());
   console.log(
     "Seeded Analyzer with Modules:",
-    Object.keys(modulePackages).length
+    modulePackages.size
   );
   console.log("Total Packages to Analyze:", allKeys.length);
 
-  for (let i = PAGE_START; i < allKeys.length; i = i + PAGE_SIZE) {
+  for (let i = PAGE_START; i < allKeys.length && i < PAGE_END; i = i + PAGE_SIZE) {
     console.time(`page`);
     (await Promise.all(
       allKeys
@@ -73,14 +78,17 @@ async function run(stats) {
         .map(analyzePackageForModule)
     ))
       .filter(Boolean)
-      .map(pkgName => (modulePackages[pkgName] = true));
+      .map(pkgName => (modulePackages.add(pkgName)));
     console.timeEnd(`page`);
 
     if (i % 2000 === 0 && i !== PAGE_START) {
       console.log("Saving", i);
-      saveFile(modulePackages);
+      saveFile(Array.from(modulePackages));
       console.log("Saved", i);
     }
     console.log("Searched", i);
   }
+  console.log("Saving Done");
+  saveFile(Array.from(modulePackages));
+  console.log("Saved Done");
 }
