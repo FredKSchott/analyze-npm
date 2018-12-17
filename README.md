@@ -1,8 +1,7 @@
 # @pikapkg/analyze-npm
 
-This repository searches the npm graph for the most popular "module" packages.
-
-Based on the fantastic `npmrank` package by @anvaka: https://github.com/anvaka/npmrank
+This repository searches the npm graph for the most popular "module" packages.  
+Based on [@anvaka/npmrank](https://github.com/anvaka/npmrank).
 
 
 # Setup
