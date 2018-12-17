@@ -40,6 +40,7 @@ load(inputFileName, function(packages) {
 
     function addNode(pkg) {
       graph.addNode(pkg.id, {
+        module: pkg.value.module,
         maintainers: pkg.value.maintainers
       });
       var deps = getDpendencies(pkg.value, kind);
