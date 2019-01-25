@@ -1,20 +1,20 @@
 var fs = require('fs');
 // 277000: First module is at 277026
 // 8010766: last full sync
-const STARTING_SEQ = 8010766;
+const STARTING_SEQ = 0;
 
 function loadFile() {
-  return JSON.parse(fs.readFileSync("./analysis/found-modules.json"));
+  return JSON.parse(fs.readFileSync("./analysis/found-packages-with-files.json"));
 }
 
 function saveFile(contents) {
   fs.writeFileSync(
-    "./analysis/found-modules.json",
-    JSON.stringify(contents, null, "  ")
+    "./analysis/found-packages-with-files.json",
+    JSON.stringify(Array.from(contents), null, "  ")
   );
 }
 
-const results = loadFile();
+const results = new Set(loadFile());
 const registry = require('package-stream')({since: STARTING_SEQ});
 let count = 0;
 console.time(count);
@@ -29,23 +29,12 @@ registry
       console.log('Saved.', Object.keys(results).length);
       console.time(count + 1000);
     }
-    if(!pkg.module) {
-      return;
+    if(pkg.files) {
+      results.add(pkg.name);
+    } else {
+      results.remove(pkg.name);
     }
-    // console.log(seq);
-    if (!results[pkg.name]) {
-      console.log('NEW!', pkg.name);
-    }
-    results[pkg.name] = {
-      deps: pkg.dependencies ? Object.keys(pkg.dependencies).length : 0,
-      se: pkg.sideEffects,
-    };
-    if(pkg.typings || pkg.types) {
-      results[pkg.name].ts = true;
-    }
-    // if(pkg['umd:main'] || pkg['umd']) {
-    //   results[pkg.name].umd = true;
-    // }
+
   })
   .on('up-to-date', function (seq) {
     console.log(`[${seq}] Done! Found ${Object.keys(results).length} modules.`);

@@ -1,2 +1,2 @@
 #!/bin/sh
-curl https://skimdb.npmjs.com/registry/_design/scratch/_view/byField > ./data/byField.in.graph
+curl https://replicate.npmjs.com/registry/_design/scratch/_view/byField > ./data/byField.in.graph

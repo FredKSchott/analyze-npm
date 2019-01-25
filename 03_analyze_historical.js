@@ -18,7 +18,7 @@ function loadFile() {
   try {
     return JSON.parse(fs.readFileSync("./analysis/found-modules.json"));
   } catch (err) {
-    return [];
+    return {};
   }
 }
 
@@ -32,15 +32,15 @@ function saveFile(modulePackages) {
 console.log("* Date: " + new Date().toUTCString());
 run();
 
-async function analyzePackageForModule(pkgName) {
+async function analyzePackageForModule([pkgName]) {
   let response;
   try {
     response = await got("http://registry.npmjs.org/" + pkgName, {
       json: true
     });
   } catch (err) {
-    // console.log(err);
-    errors.push([pkgName, err]);
+    console.log("http://registry.npmjs.org/" + pkgName, err);
+    // errors.push([pkgName, err]);
     return false;
   }
   if (!response.body.versions && !response.body.time) {
@@ -60,6 +60,9 @@ async function analyzePackageForModule(pkgName) {
   );
 
   for (const [version, publishDate] of sortedVersions) {
+    if (!response.body.versions) {
+      continue;
+    }
     const packageData = response.body.versions[version];
     if (!packageData) {
       continue;
@@ -74,19 +77,20 @@ async function analyzePackageForModule(pkgName) {
 }
 
 async function run() {
-  const modulePackages = loadFile();
-  console.log("Seeded Analyzer with Modules:", modulePackages.length);
+  const modulePackages = Object.entries(loadFile());
+  const modulePackagesTotal = modulePackages.length;
+  console.log("Seeded Analyzer with Modules:", modulePackagesTotal);
 
   const results = {};
   for (
     let i = PAGE_START;
-    i < modulePackages.length && i < PAGE_END;
+    i < modulePackagesTotal && i < PAGE_END;
     i = i + PAGE_SIZE
   ) {
     console.time(`page`);
     (await Promise.all(
       modulePackages
-        .slice(i, Math.min(i + PAGE_SIZE, modulePackages.length))
+        .slice(i, Math.min(i + PAGE_SIZE, modulePackagesTotal))
         .map(analyzePackageForModule)
     ))
       .filter(Boolean)
