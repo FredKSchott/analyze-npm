@@ -8,8 +8,8 @@ Based on [@anvaka/npmrank](https://github.com/anvaka/npmrank).
 
 #### 1. Clone & Install
 ```
-git clone https://github.com/pikapkg/npm-esm-analyze.git
-cd npm-esm-analyze
+git clone https://github.com/pikapkg/analyze-npm.git
+cd analyze-npm
 npm install
 ```
 
